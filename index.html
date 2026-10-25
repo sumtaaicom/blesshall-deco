@@ -74,7 +74,7 @@
       <div>
         <ul class="plan">
           <li>벽 위쪽 끝을 따라 <b>웜화이트 전구 줄조명</b>을 늘어지게 걸기</li>
-          <li>문 왼쪽: <b>"우리의 순간들" 사진존</b> — 모임·수련회 사진을 인화해 마끈 + 우드 집게로</li>
+          <li>문 왼쪽: <b>"우리의 이야기" 액자 갤러리</b> — 모임·수련회 사진을 크게 인화해 원목 액자 8개에 넣고 크기를 섞어 배치 (꼭꼭핀·접착식 액자 걸이)</li>
           <li>문 오른쪽: <b>LED 네온사인 "You are loved"</b> + 타이포 <b>말씀 포스터 2장</b>(요한일서 4:19, 이사야 41:10, A3 무타공 액자)</li>
           <li>TV 오른쪽: <b>기도 제목 코르크 보드</b> — 왼쪽 "기도해 주세요", 오른쪽 "응답됐어요". 응답받으면 카드를 오른쪽으로 옮기고, 본 친구는 카드 아래에 바를 정(正) 자를 한 획씩 그어 "함께 기도했어요" 표시</li>
         </ul>
@@ -94,6 +94,7 @@
         <ul class="plan">
           <li>창문 위 천장선에 <b>크림·남색 가랜드(삼각 깃발)</b></li>
           <li>수납장 위에 <b>말씀 카드 액자</b>(무타공 스탠드 액자)를 나란히</li>
+          <li>수납장 위에 <b>미니 조화 화분 3개</b></li>
           <li>수납장 앞면은 <b>문이라 비워 둠</b> — 기도 제목 카드는 뒤쪽 벽 TV 옆 코르크 보드로 옮김</li>
         </ul>
       </div>
@@ -115,8 +116,9 @@
       <div>
         <ul class="plan">
           <li>문 왼쪽 흰 면은 <b>수납장 문이라 비워 둠</b> (여닫는 데 방해 없게)</li>
-          <li>문 오른쪽 벽에 <b>레터링 스티커 문구</b> "함께 빛나는 우리" + 작은 줄조명</li>
+          <li>문 오른쪽 벽에 <b>레터링 스티커 문구</b> "함께 예배하고, 함께 자라다" + 작은 줄조명</li>
           <li>문구 아래 <b>우리 청소년부 단체 사진 포스터</b> (무타공 포스터 액자)</li>
+          <li>포스터 옆 바닥에 <b>조화 올리브나무</b> (수납장 문·통로를 막지 않는 자리)</li>
         </ul>
       </div>
     </div>
@@ -140,10 +142,13 @@
 <script>
 // 준비물 데이터: 이름, 쿠팡 검색어, 벽, 수량, 예상 단가, 우선순위
 const items = [
-  ["웜화이트 LED 전구 줄조명 10m (USB·건전지)", "LED 전구 줄조명 웜화이트 10m", "뒤쪽", 3, 15900, 1],
+  ["웜화이트 LED 전구 줄조명 10m (USB·건전지)", "LED 전구 줄조명 웜화이트 10m", "뒤쪽", 2, 15900, 1],
   ["무타공 투명 후크·전선 고정 클립", "무타공 투명 후크 전선 클립", "공통", 2, 6900, 1],
-  ["폴라로이드 사진 걸이 (마끈+우드 집게 세트)", "사진 걸이 마끈 우드집게 세트", "뒤쪽", 3, 7900, 1],
-  ["사진 인화 (4x6, 학생 사진)", "사진 인화 4x6", "뒤쪽", 60, 250, 1],
+  ["원목 액자 (8x10·11x14 섞어서, 갤러리용)", "원목 액자 8x10", "뒤쪽", 8, 7900, 1],
+  ["사진 인화 (8x10, 모임·수련회 사진)", "사진 인화 8x10", "뒤쪽", 8, 1500, 1],
+  ["접착식 액자 걸이 스트립 (무타공)", "커맨드 액자걸이 스트립", "뒤쪽", 1, 9900, 1],
+  ["조화 올리브나무 120cm", "조화 올리브나무 120cm", "우측", 1, 39900, 2],
+  ["미니 조화 화분", "미니 조화 화분", "좌측", 3, 5900, 3],
   ["코르크 메모 보드 60x90 (무타공 걸이)", "코르크보드 60x90", "뒤쪽", 2, 24900, 1],
   ["컬러 포스트잇 대용량", "포스트잇 대용량 세트", "뒤쪽", 2, 9900, 2],
   ["LED 네온사인 문구 \"You are loved\" (USB)", "LED 네온사인 You are loved", "뒤쪽", 1, 39000, 1],
@@ -233,6 +238,30 @@ function bunting(svg,x1,y1,x2,y2,n,size){
   for(let i=0;i<n;i++){const t=(i+.5)/n,x=(1-t)**2*x1+2*(1-t)*t*mx+t*t*x2,y=(1-t)**2*y1+2*(1-t)*t*my+t*t*y2;
     el(svg,"path",{d:`M${x-size/2},${y} L${x+size/2},${y} L${x},${y+size*1.3}Z`,fill:i%2?"#2f4a6d":"#f3e6c8",stroke:"#fff","stroke-width":.5});}
 }
+// 원목 액자 갤러리 (크기가 섞인 액자 + 사진)
+function gallery(svg,x,y,w,h,title){
+  const pal=["#d9c7a8","#b9cbe0","#e6d6b0","#c6d9c0","#e0c3c3"];
+  if(title)el(svg,"text",{x:x+w/2,y:y-h*.06,"text-anchor":"middle","font-size":h*.11,"font-weight":700,fill:"#f4ede0","letter-spacing":1},title);
+  // [x, y, 너비, 높이] 비율
+  [[0,0,.22,.3],[0,.36,.22,.28],[.26,0,.26,.38],[.26,.44,.26,.3],[.56,.02,.44,.62],[.56,.7,.2,.3],[.8,.7,.2,.3],[0,.7,.22,.3],[.26,.8,.26,.2]].forEach((f,i)=>{
+    const fx=x+f[0]*w,fy=y+f[1]*h,fw=f[2]*w,fh=f[3]*h,m=Math.min(fw,fh)*.1;
+    el(svg,"rect",{x:fx,y:fy,width:fw,height:fh,fill:"#b88a57",filter:"url(#sh)"});
+    el(svg,"rect",{x:fx+m*.5,y:fy+m*.5,width:fw-m,height:fh-m,fill:"#fbf7ee"});
+    el(svg,"rect",{x:fx+m*1.3,y:fy+m*1.3,width:fw-m*2.6,height:fh-m*2.6,fill:pal[i%5]});
+    const pw=fw-m*2.6,ph=fh-m*2.6,px=fx+m*1.3,py=fy+m*1.3,n=1+i%3;
+    for(let p=0;p<n;p++){const cx=px+pw*(p+.5)/n,r=Math.min(pw/n,ph)*.16;
+      el(svg,"circle",{cx,cy:py+ph*.5,r,fill:"#4a3f38",opacity:.7});
+      el(svg,"path",{d:`M${cx-r*1.6},${py+ph} Q${cx},${py+ph*.55} ${cx+r*1.6},${py+ph}Z`,fill:"#4a3f38",opacity:.7});}
+  });
+}
+// 조화 화분 (x: 가운데, y: 바닥, h: 전체 높이)
+function plant(svg,x,y,h){
+  const pw=h*.28;
+  el(svg,"path",{d:`M${x-pw/2},${y-h*.22} L${x+pw/2},${y-h*.22} L${x+pw*.38},${y} L${x-pw*.38},${y}Z`,fill:"#f4f1ea",filter:"url(#sh)"});
+  el(svg,"line",{x1:x,y1:y-h*.22,x2:x,y2:y-h*.7,stroke:"#7a5a3a","stroke-width":Math.max(1,h*.02)});
+  for(let k=0;k<14;k++){const a=k*2.4,rr=h*.2*(.4+(k%4)*.2),cx=x+Math.cos(a)*rr,cy=y-h*.7+Math.sin(a)*rr*.9;
+    el(svg,"ellipse",{cx,cy,rx:h*.07,ry:h*.035,fill:k%3?"#5f7d4e":"#7f9b62",transform:`rotate(${k*37} ${cx} ${cy})`});}
+}
 // LED 네온사인 문구
 function neon(svg,x,y,size,txt){
   el(svg,"text",{x,y,"text-anchor":"middle","font-size":size,"font-family":"'Brush Script MT','Snell Roundhand',cursive",fill:"none",stroke:"#ffb347","stroke-width":size*.18,opacity:.35,filter:"url(#neonblur)"},txt);
@@ -255,15 +284,14 @@ function frame(svg,x,y,w,h,txt){
 // 뒤쪽 벽 전체 (wall3)
 let s=document.getElementById("s3");defs(s);
 lights(s,132,254,578,254,10,24,2);
-polaroids(s,252,275,3,2,14,4);
+gallery(s,253,277,54,38,"우리의 이야기");
 board(s,470,268,100,52,"기도 제목");
 neon(s,180,290,11,"You are loved");
 
 // 뒤쪽 벽 문 주변 (wall4)
 s=document.getElementById("s4");defs(s);
 lights(s,95,142,598,142,22,20,4);
-el(s,"text",{x:186,y:178,"text-anchor":"middle","font-size":13,"font-weight":700,fill:"#f4ede0","letter-spacing":2},"우리의 순간들");
-polaroids(s,112,192,4,3,34,8);
+gallery(s,112,190,172,125,"우리의 이야기");
 neon(s,512,205,40,"You are loved");
 verse(s,440,250,68,96,true,["우리가 사랑함은","그가 먼저","우리를","사랑하셨음이라"],"요한일서 4:19");
 verse(s,520,250,68,96,false,["두려워하지 말라","내가 너와","함께 함이라"],"이사야 41:10");
@@ -281,12 +309,16 @@ bunting(s,195,228,470,228,14,9);
 lights(s,40,212,190,228,10,8,2);
 [0,1,2,3,4].forEach(i=>frame(s,200+i*52,300,22,18,["빛","소망","믿음","사랑","기쁨"][i]));
 // 수납장 앞면은 문이라 아무것도 붙이지 않는다 (기도 카드는 뒤쪽 벽 코르크 보드로 이동)
+// 수납장 위 미니 화분
+plant(s,196,318,20);plant(s,460,318,20);plant(s,482,318,16);
 
 // 우측 벽 (wall2)
 s=document.getElementById("s2");defs(s);
 // 문 왼쪽 흰 면은 수납장 문이라 비워 두고, 문 오른쪽 벽만 꾸민다
 lights(s,390,224,506,224,4,7,2);
-el(s,"text",{x:447,y:247,"text-anchor":"middle","font-size":11,"font-weight":800,fill:"#2f4a6d"},"함께 빛나는 우리");
+el(s,"text",{x:447,y:240,"text-anchor":"middle","font-size":8.5,"font-weight":800,fill:"#2f4a6d"},"함께 예배하고,");
+el(s,"text",{x:447,y:251,"text-anchor":"middle","font-size":8.5,"font-weight":800,fill:"#2f4a6d"},"함께 자라다");
+plant(s,500,330,62);
 el(s,"rect",{x:403,y:256,width:88,height:58,fill:"#3b2f25",filter:"url(#sh)"});
 el(s,"rect",{x:406,y:259,width:82,height:52,fill:"#cfd9e6"});
 for(let p=0;p<5;p++){const cx=414+p*16;el(s,"circle",{cx,cy:278,r:4,fill:"#4a3f38",opacity:.7});el(s,"path",{d:`M${cx-7},311 Q${cx},281 ${cx+7},311Z`,fill:"#4a3f38",opacity:.7});}
