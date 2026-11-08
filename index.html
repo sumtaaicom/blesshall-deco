@@ -39,6 +39,32 @@
   .ok{color:#1d7a46}.over{color:#c0392b}
   .prio{display:inline-block;min-width:22px;text-align:center;border-radius:6px;background:var(--navy);color:#fff;font-size:12px;padding:1px 6px}
   .p2{background:#7a8aa3}.p3{background:#b9b2a5}
+  .teams{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  @media (max-width:420px){.teams{grid-template-columns:1fr}}
+  .people{display:flex;gap:8px;font-size:13px!important}
+  .people span{flex:none;color:var(--sub);min-width:58px}
+  .todo-h{display:flex;justify-content:space-between;align-items:baseline;margin:12px 0 4px;font-size:14px}
+  .prog{font-size:12px;color:var(--sub)}
+  ul.todo{list-style:none;margin:0;padding:0}
+  ul.todo li{padding:8px 0;border-top:1px solid var(--line)}
+  ul.todo label{display:flex;gap:8px;align-items:flex-start;font-size:14px;cursor:pointer}
+  ul.todo input[type=checkbox]{appearance:none;flex:none;width:18px;height:18px;margin:1px 0 0;border:2px solid var(--sub);border-radius:5px;background:#fff;cursor:pointer;display:grid;place-content:center}
+  ul.todo input[type=checkbox]:checked{background:var(--navy);border-color:var(--navy)}
+  ul.todo input[type=checkbox]:checked::after{content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  ul.todo input[type=checkbox]:focus-visible,.who:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  ul.todo li.done label span{text-decoration:line-through;color:var(--sub)}
+  .who{margin:6px 0 0 26px;width:calc(100% - 26px);border:1px dashed transparent;border-radius:6px;padding:3px 6px;font:inherit;font-size:13px;font-weight:700;color:var(--c);background:#f6f1e8}
+  .who:hover{border-color:var(--c)}
+  .tcard{border:1px solid var(--line);border-top:5px solid;border-radius:10px;padding:12px;background:#fffdf9}
+  .tcard h3{margin:8px 0 2px;font-size:16px}
+  .tcard p{margin:4px 0;font-size:14px}
+  .tcard .where{color:var(--sub);font-size:13px}
+  .tcard .tsum{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+  .team{display:inline-block;color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .zname{font-size:12px;color:var(--sub);margin-top:2px}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+  .fbtn{border:1px solid var(--c,var(--ink));background:#fff;color:var(--c,var(--ink));border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}
+  .fbtn.on{background:var(--c,var(--ink));color:#fff}
   .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;padding:8px 4px}
   .pc{position:relative;background:#d8bf98;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.025) 0 2px,transparent 2px 4px);padding:18px 16px 12px;box-shadow:0 3px 8px rgba(0,0,0,.18);transform:rotate(-1.2deg);color:#2a2219}
   .pc:nth-child(2){transform:rotate(1deg)}.pc:nth-child(3){transform:rotate(-.4deg)}
@@ -124,6 +150,12 @@
     </div>
   </section>
 
+  <section class="wall" id="teams">
+    <h2>목장별 담당 존</h2>
+    <p class="note">5개 목장이 존 하나씩 맡아 준비물 구매부터 설치까지 책임집니다. 사진 위 색깔 표시가 각 목장의 존입니다. 담당자는 11월 8일 출석 기준이며, 이름 칸을 눌러 바로 고칠 수 있습니다. 체크와 이름 변경은 <b>지금 보는 브라우저에만</b> 저장되니, 확정된 변경은 따로 알려 주시면 모두가 보는 화면에 반영합니다.</p>
+    <div class="teams" id="teamCards"></div>
+  </section>
+
   <section class="wall" id="supplies">
     <h2>준비물 목록 · 쿠팡 구매</h2>
     <p class="note">단가는 쿠팡 기준 <b>예상가</b>입니다. "쿠팡에서 찾기"를 눌러 로켓배송 상품을 고르고, 실제 가격으로 단가 칸을 고치면 합계가 다시 계산됩니다. 결제·수령은 원석쌤이 직접 진행합니다.</p>
@@ -132,42 +164,124 @@
       <div class="pill">가정 예산<br><b>300,000~500,000원</b></div>
       <div class="pill">판정<br><b id="judge">-</b></div>
     </div>
+    <div class="filters" id="filters" role="group" aria-label="목장별 보기"></div>
     <div class="wrap"><table>
-      <thead><tr><th>우선순위</th><th>품목</th><th>벽</th><th class="num">수량</th><th class="num">단가(예상)</th><th class="num">합계</th><th>구매</th></tr></thead>
+      <thead><tr><th>우선순위</th><th>목장 · 존</th><th>품목</th><th class="num">수량</th><th class="num">단가(예상)</th><th class="num">합계</th><th>구매</th></tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
   </section>
 </main>
 
 <script>
-// 준비물 데이터: 이름, 쿠팡 검색어, 벽, 수량, 예상 단가, 우선순위
+// 목장별 담당 존
+// 담당자는 11/8 출석 학생 기준. 인원이 적은 목장은 담임 선생님이 함께 맡는다.
+const zones = {
+  A: {team:"레전더리 소다팝", color:"#e0563b", name:"우리의 이야기 갤러리", where:"뒤쪽 벽 · 문 왼쪽",
+      teachers:["이원석","김민주"], members:["장유진","김소울","김영은","남소현","이예은"],
+      tasks:[
+        {text:"갤러리에 넣을 모임·수련회 사진 8장 고르기", who:["장유진","김소울"]},
+        {text:"사진 8x10 인화 주문", who:["김영은"]},
+        {text:"원목 액자 8개·접착식 액자 걸이 스트립 쿠팡 주문", who:["남소현"]},
+        {text:"액자 배치도 그리기 (크기 섞어서)", who:["이예은"]},
+        {text:"(실행 모임) 사진 넣고 벽에 걸기", who:["전원"]},
+      ]},
+  B: {team:"솔로몬", color:"#7a4fa0", name:"네온사인 · 말씀 포스터", where:"뒤쪽 벽 · 문 오른쪽 + 벽 위쪽 줄조명",
+      teachers:["김태범","최진호"], members:["강노아","김윤하","김주혁","배경진","이규연","정규언","최예준"],
+      tasks:[
+        {text:"말씀 포스터 2장 디자인 (요한일서 4:19, 이사야 41:10)", who:["강노아","김윤하"]},
+        {text:"포스터 A3 출력·A3 액자 2개 주문", who:["김주혁"]},
+        {text:"LED 네온사인 \"You are loved\" 주문", who:["배경진"]},
+        {text:"뒤쪽 벽 줄조명·고정 클립 주문", who:["정규언"]},
+        {text:"(실행 모임) 포스터·네온사인 설치", who:["이규연","배경진"]},
+        {text:"(실행 모임) 뒤쪽 벽 위쪽 줄조명 걸기", who:["정규언","최예준"]},
+      ]},
+  C: {team:"양떼", color:"#3d7a5a", name:"기도 제목 보드", where:"뒤쪽 벽 · TV 오른쪽",
+      teachers:["장은주"], members:["김서정","김은강","데이빗"],
+      tasks:[
+        {text:"코르크 보드 2개·테이프 주문", who:["김서정"]},
+        {text:"크래프트 카드·포스트잇 주문", who:["김은강"]},
+        {text:"기도 카드 예시 5장 쓰기", who:["김은강","데이빗"]},
+        {text:"(실행 모임) 보드 설치, \"기도해 주세요 / 응답됐어요\" 표시", who:["데이빗","김서정"]},
+      ]},
+  D: {team:"삼삼한", color:"#c58a16", name:"가랜드 · 말씀 카드 · 화분", where:"좌측 벽 · 창문 위와 수납장 위",
+      teachers:["이수진","김인회"], members:["홍종현"],
+      tasks:[
+        {text:"가랜드·스탠드 액자·미니 화분·테이프 주문", who:["홍종현"]},
+        {text:"말씀 카드 6장 쓰기", who:["홍종현","이수진 선생님"]},
+        {text:"(실행 모임) 가랜드 걸기, 액자·화분 배치 (수납장 문은 비워 두기)", who:["홍종현","김인회 선생님"]},
+      ]},
+  E: {team:"세움", color:"#2f6fae", name:"레터링 · 단체 사진", where:"우측 벽 · 문 오른쪽",
+      teachers:["반수정","김진영"], members:["강현중","김한준"],
+      tasks:[
+        {text:"레터링 스티커 \"함께 예배하고, 함께 자라다\" 주문", who:["강현중"]},
+        {text:"단체 사진 고르기·A1 출력, A1 액자 주문", who:["김한준"]},
+        {text:"줄조명·고정 클립·조화 올리브나무 주문", who:["반수정 선생님"]},
+        {text:"(실행 모임) 레터링 붙이기·포스터 걸기", who:["강현중","김한준"]},
+        {text:"(실행 모임) 줄조명·올리브나무 배치", who:["김진영 선생님","김한준"]},
+      ]},
+};
+// 준비물 데이터: 이름, 쿠팡 검색어, 존, 수량, 예상 단가, 우선순위
 const items = [
-  ["웜화이트 LED 전구 줄조명 10m (USB·건전지)", "LED 전구 줄조명 웜화이트 10m", "뒤쪽", 2, 15900, 1],
-  ["무타공 투명 후크·전선 고정 클립", "무타공 투명 후크 전선 클립", "공통", 2, 6900, 1],
-  ["원목 액자 (8x10·11x14 섞어서, 갤러리용)", "원목 액자 8x10", "뒤쪽", 8, 7900, 1],
-  ["사진 인화 (8x10, 모임·수련회 사진)", "사진 인화 8x10", "뒤쪽", 8, 1500, 1],
-  ["접착식 액자 걸이 스트립 (무타공)", "커맨드 액자걸이 스트립", "뒤쪽", 1, 9900, 1],
-  ["조화 올리브나무 120cm", "조화 올리브나무 120cm", "우측", 1, 39900, 2],
-  ["미니 조화 화분", "미니 조화 화분", "좌측", 3, 5900, 3],
-  ["코르크 메모 보드 60x90 (무타공 걸이)", "코르크보드 60x90", "뒤쪽", 2, 24900, 1],
-  ["컬러 포스트잇 대용량", "포스트잇 대용량 세트", "뒤쪽", 2, 9900, 2],
-  ["LED 네온사인 문구 \"You are loved\" (USB)", "LED 네온사인 You are loved", "뒤쪽", 1, 39000, 1],
-  ["A3 무타공 액자 (말씀 포스터용)", "A3 액자 블랙 무타공", "뒤쪽", 2, 12900, 2],
-  ["말씀 포스터 출력 A3 (요일 4:19·사 41:10)", "포스터 출력 A3", "뒤쪽", 2, 3000, 2],
-  ["가랜드 삼각 깃발 (크림·네이비)", "삼각 가랜드 네이비 크림", "좌측", 2, 8900, 2],
-  ["무타공 스탠드 액자 A4 (말씀 카드)", "원목 액자 A4 스탠드", "좌측", 6, 6900, 2],
-  ["크래프트 메모 카드 100매 (기도 제목 카드)", "크래프트 메모카드 100매", "뒤쪽", 1, 5900, 2],
-  ["마스킹테이프·양면 폼테이프 세트", "벽 손상 없는 양면테이프 마스킹테이프", "공통", 2, 8900, 1],
-  ["레터링 스티커 (문구 맞춤 제작)", "레터링 스티커 맞춤 제작", "우측", 1, 25000, 1],
-  ["무타공 벽면 포스터 액자 세트 (A1)", "무타공 포스터 액자 A1", "우측", 1, 39900, 2],
-  ["단체 사진 대형 포스터 출력 (A1)", "포스터 출력 A1", "우측", 1, 15000, 2],
+  ["원목 액자 (8x10·11x14 섞어서, 갤러리용)", "원목 액자 8x10", "A", 8, 7900, 1],
+  ["사진 인화 (8x10, 모임·수련회 사진)", "사진 인화 8x10", "A", 8, 1500, 1],
+  ["접착식 액자 걸이 스트립 (무타공)", "커맨드 액자걸이 스트립", "A", 1, 9900, 1],
+  ["LED 네온사인 문구 \"You are loved\" (USB)", "LED 네온사인 You are loved", "B", 1, 39000, 1],
+  ["웜화이트 LED 전구 줄조명 10m (뒤쪽 벽 위쪽)", "LED 전구 줄조명 웜화이트 10m", "B", 1, 15900, 1],
+  ["무타공 투명 후크·전선 고정 클립 (뒤쪽 벽)", "무타공 투명 후크 전선 클립", "B", 1, 6900, 1],
+  ["A3 무타공 액자 (말씀 포스터용)", "A3 액자 블랙 무타공", "B", 2, 12900, 2],
+  ["말씀 포스터 출력 A3 (요일 4:19·사 41:10)", "포스터 출력 A3", "B", 2, 3000, 2],
+  ["코르크 메모 보드 60x90 (무타공 걸이)", "코르크보드 60x90", "C", 2, 24900, 1],
+  ["마스킹테이프·양면 폼테이프 세트", "벽 손상 없는 양면테이프 마스킹테이프", "C", 1, 8900, 1],
+  ["컬러 포스트잇 대용량", "포스트잇 대용량 세트", "C", 2, 9900, 2],
+  ["크래프트 메모 카드 100매 (기도 제목 카드)", "크래프트 메모카드 100매", "C", 1, 5900, 2],
+  ["마스킹테이프·양면 폼테이프 세트", "벽 손상 없는 양면테이프 마스킹테이프", "D", 1, 8900, 1],
+  ["가랜드 삼각 깃발 (크림·네이비)", "삼각 가랜드 네이비 크림", "D", 2, 8900, 2],
+  ["무타공 스탠드 액자 A4 (말씀 카드)", "원목 액자 A4 스탠드", "D", 6, 6900, 2],
+  ["미니 조화 화분", "미니 조화 화분", "D", 3, 5900, 3],
+  ["레터링 스티커 (문구 맞춤 제작)", "레터링 스티커 맞춤 제작", "E", 1, 25000, 1],
+  ["웜화이트 LED 전구 줄조명 10m (우측 벽)", "LED 전구 줄조명 웜화이트 10m", "E", 1, 15900, 1],
+  ["무타공 투명 후크·전선 고정 클립 (우측 벽)", "무타공 투명 후크 전선 클립", "E", 1, 6900, 1],
+  ["무타공 벽면 포스터 액자 세트 (A1)", "무타공 포스터 액자 A1", "E", 1, 39900, 2],
+  ["단체 사진 대형 포스터 출력 (A1)", "포스터 출력 A1", "E", 1, 15000, 2],
+  ["조화 올리브나무 120cm", "조화 올리브나무 120cm", "E", 1, 39900, 2],
 ];
 const won = n => n.toLocaleString("ko-KR") + "원";
 const tb = document.getElementById("rows");
-items.sort((a,b)=>a[5]-b[5]);
+const zkeys = Object.keys(zones);
+items.sort((a,b)=>zkeys.indexOf(a[2])-zkeys.indexOf(b[2])||a[5]-b[5]);
+const chip = z => `<span class="team" style="background:${zones[z].color}">${zones[z].team}</span>`;
+// 목장별 존 카드
+// 체크·담당자 변경은 이 브라우저에만 저장한다
+const store = (()=>{let s={}; try{s=JSON.parse(localStorage.getItem("blesshall-todo")||"{}");}catch(e){}
+  return {get:k=>s[k], set:(k,v)=>{s[k]=v; try{localStorage.setItem("blesshall-todo",JSON.stringify(s));}catch(e){}}};})();
+const esc = t => String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+document.getElementById("teamCards").innerHTML = zkeys.map(z=>{const Z=zones[z];
+  return `<div class="tcard" style="border-top-color:${Z.color}">
+  ${chip(z)}<h3>${Z.name}</h3><p class="where">${Z.where}</p>
+  <p class="people"><span>담임</span>${Z.teachers.map(t=>t+" 선생님").join(", ")}</p>
+  <p class="people"><span>출석 ${Z.members.length}명</span>${Z.members.join(", ")}</p>
+  <div class="todo-h"><b>할 일</b><span class="prog" id="prog${z}"></span></div>
+  <ul class="todo">${Z.tasks.map((t,i)=>{const k=z+i, who=store.get("w"+k)??t.who.join(", ");
+    return `<li><label><input type="checkbox" data-k="${k}" data-z="${z}" ${store.get("c"+k)?"checked":""}><span>${esc(t.text)}</span></label>
+    <input class="who" data-k="${k}" value="${esc(who)}" aria-label="${esc(t.text)} 담당자" style="--c:${Z.color}"></li>`;}).join("")}</ul>
+  <p class="tsum">준비물 <b id="cnt${z}"></b>개 · 소계 <b id="tot${z}"></b></p></div>`;}).join("");
+const tc = document.getElementById("teamCards");
+function prog(){zkeys.forEach(z=>{const all=tc.querySelectorAll(`input[type=checkbox][data-z="${z}"]`), done=[...all].filter(c=>c.checked).length;
+  document.getElementById("prog"+z).textContent=`${done}/${all.length} 완료`;});}
+tc.addEventListener("change",e=>{const el=e.target;
+  if(el.type==="checkbox"){store.set("c"+el.dataset.k,el.checked); el.closest("li").classList.toggle("done",el.checked); prog();}});
+tc.addEventListener("input",e=>{if(e.target.classList.contains("who"))store.set("w"+e.target.dataset.k,e.target.value);});
+tc.querySelectorAll("input[type=checkbox]:checked").forEach(c=>c.closest("li").classList.add("done"));
+prog();
+// 목장별 보기 버튼
+const fl = document.getElementById("filters");
+fl.innerHTML = `<button class="fbtn on" data-z="">전체</button>` + zkeys.map(z=>`<button class="fbtn" data-z="${z}" style="--c:${zones[z].color}">${zones[z].team}</button>`).join("");
+fl.addEventListener("click",e=>{const b=e.target.closest(".fbtn"); if(!b)return;
+  fl.querySelectorAll(".fbtn").forEach(x=>x.classList.toggle("on",x===b));
+  tb.querySelectorAll("tr").forEach(tr=>tr.hidden=!!b.dataset.z&&tr.dataset.z!==b.dataset.z);});
 items.forEach((it,i)=>{
-  const tr=document.createElement("tr");
-  tr.innerHTML=`<td><span class="prio ${it[5]>1?'p'+it[5]:''}">${it[5]}</span></td><td>${it[0]}</td><td>${it[2]}</td>
+  const tr=document.createElement("tr"); tr.dataset.z=it[2];
+  tr.innerHTML=`<td><span class="prio ${it[5]>1?'p'+it[5]:''}">${it[5]}</span></td><td>${chip(it[2])}<div class="zname">${zones[it[2]].name}</div></td><td>${it[0]}</td>
   <td class="num"><input type="number" min="0" value="${it[3]}" data-i="${i}" data-k="3" style="width:56px" aria-label="수량"></td>
   <td class="num"><input type="number" min="0" step="100" value="${it[4]}" data-i="${i}" data-k="4" style="width:84px" aria-label="단가"></td>
   <td class="num" id="sub${i}"></td>
@@ -175,7 +289,9 @@ items.forEach((it,i)=>{
   tb.appendChild(tr);
 });
 function calc(){
-  let t=0; items.forEach((it,i)=>{const s=it[3]*it[4]; t+=s; document.getElementById("sub"+i).textContent=won(s);});
+  let t=0; const zt={}, zc={};
+  items.forEach((it,i)=>{const s=it[3]*it[4]; t+=s; zt[it[2]]=(zt[it[2]]||0)+s; zc[it[2]]=(zc[it[2]]||0)+1; document.getElementById("sub"+i).textContent=won(s);});
+  zkeys.forEach(z=>{document.getElementById("tot"+z).textContent=won(zt[z]||0); document.getElementById("cnt"+z).textContent=zc[z]||0;});
   document.getElementById("total").textContent=won(t);
   const j=document.getElementById("judge");
   j.textContent = t>500000?"예산 초과":t>=300000?"예산 안":"예산 여유";
@@ -262,6 +378,12 @@ function plant(svg,x,y,h){
   for(let k=0;k<14;k++){const a=k*2.4,rr=h*.2*(.4+(k%4)*.2),cx=x+Math.cos(a)*rr,cy=y-h*.7+Math.sin(a)*rr*.9;
     el(svg,"ellipse",{cx,cy,rx:h*.07,ry:h*.035,fill:k%3?"#5f7d4e":"#7f9b62",transform:`rotate(${k*37} ${cx} ${cy})`});}
 }
+// 목장 존 표시 (가운데 x, y)
+function badge(svg,x,y,z,size=9){
+  const t=zones[z].team, w=t.length*size*.95+size*1.6, h=size*1.8;
+  el(svg,"rect",{x:x-w/2,y:y-h/2,width:w,height:h,rx:h/2,fill:zones[z].color,stroke:"#fff","stroke-width":1,filter:"url(#sh)"});
+  el(svg,"text",{x,y:y+size*.36,"text-anchor":"middle","font-size":size,"font-weight":700,fill:"#fff"},t);
+}
 // LED 네온사인 문구
 function neon(svg,x,y,size,txt){
   el(svg,"text",{x,y,"text-anchor":"middle","font-size":size,"font-family":"'Brush Script MT','Snell Roundhand',cursive",fill:"none",stroke:"#ffb347","stroke-width":size*.18,opacity:.35,filter:"url(#neonblur)"},txt);
@@ -287,11 +409,13 @@ lights(s,132,254,578,254,10,24,2);
 gallery(s,253,277,54,38,"우리의 이야기");
 board(s,470,268,100,52,"기도 제목");
 neon(s,180,290,11,"You are loved");
+badge(s,280,326,"A",6);badge(s,180,304,"B",6);badge(s,520,332,"C",6);
 
 // 뒤쪽 벽 문 주변 (wall4)
 s=document.getElementById("s4");defs(s);
 lights(s,95,142,598,142,22,20,4);
 gallery(s,112,190,172,125,"우리의 이야기");
+badge(s,198,334,"A",11);badge(s,514,364,"B",11);
 neon(s,512,205,40,"You are loved");
 verse(s,440,250,68,96,true,["우리가 사랑함은","그가 먼저","우리를","사랑하셨음이라"],"요한일서 4:19");
 verse(s,520,250,68,96,false,["두려워하지 말라","내가 너와","함께 함이라"],"이사야 41:10");
@@ -302,6 +426,7 @@ lights(s,0,120,455,112,24,18,4);
 bunting(s,100,140,260,140,7,10);
 board(s,280,150,160,150,"기도해 주세요 · 응답됐어요");
 el(s,"line",{x1:360,y1:168,x2:360,y2:296,stroke:"#fff","stroke-width":1,"stroke-dasharray":"3 3"});
+badge(s,360,318,"C",11);badge(s,228,100,"B",11);
 
 // 좌측 벽 (wall1)
 s=document.getElementById("s1");defs(s);
@@ -311,6 +436,7 @@ lights(s,40,212,190,228,10,8,2);
 // 수납장 앞면은 문이라 아무것도 붙이지 않는다 (기도 카드는 뒤쪽 벽 코르크 보드로 이동)
 // 수납장 위 미니 화분
 plant(s,196,318,20);plant(s,460,318,20);plant(s,482,318,16);
+badge(s,332,268,"D",9);
 
 // 우측 벽 (wall2)
 s=document.getElementById("s2");defs(s);
@@ -319,6 +445,7 @@ lights(s,390,224,506,224,4,7,2);
 el(s,"text",{x:447,y:240,"text-anchor":"middle","font-size":8.5,"font-weight":800,fill:"#2f4a6d"},"함께 예배하고,");
 el(s,"text",{x:447,y:251,"text-anchor":"middle","font-size":8.5,"font-weight":800,fill:"#2f4a6d"},"함께 자라다");
 plant(s,500,330,62);
+badge(s,440,326,"E",8);
 el(s,"rect",{x:403,y:256,width:88,height:58,fill:"#3b2f25",filter:"url(#sh)"});
 el(s,"rect",{x:406,y:259,width:82,height:52,fill:"#cfd9e6"});
 for(let p=0;p<5;p++){const cx=414+p*16;el(s,"circle",{cx,cy:278,r:4,fill:"#4a3f38",opacity:.7});el(s,"path",{d:`M${cx-7},311 Q${cx},281 ${cx+7},311Z`,fill:"#4a3f38",opacity:.7});}
